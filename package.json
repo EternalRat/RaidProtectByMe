@@ -1,0 +1,28 @@
+{
+  "name": "raidprotect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EternalRat/RaidProtectByMe.git"
+  },
+  "author": "EternalRat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EternalRat/RaidProtectByMe/issues"
+  },
+  "homepage": "https://github.com/EternalRat/RaidProtectByMe#readme",
+  "dependencies": {
+    "ascii-table": "0.0.9",
+    "common-tags": "^1.8.0",
+    "discord.js": "^11.6.4",
+    "fs": "0.0.1-security",
+    "moment": "^2.24.0",
+    "nodemon": "^2.0.3"
+  }
+}
