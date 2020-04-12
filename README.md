@@ -41,8 +41,8 @@ npm run dev
 
 ## Built With
 
-* [VSCode](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Discord.JS]() - Discord API for NodeJS
+* [VSCode](https://code.visualstudio.com/) - The web framework used
+* [Discord.JS](https://discord.js.org/#/) - Discord API for NodeJS
 
 ## Versioning
 
