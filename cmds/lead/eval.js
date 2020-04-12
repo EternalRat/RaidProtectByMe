@@ -1,6 +1,3 @@
-const {RichEmbed} = require("discord.js")
-const fs = require("fs")
-
 module.exports = {
     name: "eval",
     category: "lead",
