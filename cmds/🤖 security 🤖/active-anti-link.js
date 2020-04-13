@@ -7,7 +7,7 @@ module.exports = {
     name: "antilink",
     aliases: ["al", "link"],
     category: "🤖 security 🤖",
-    description: "Active the anti-link ",
+    description: "Active the anti-link [default: false]",
     usage: "<true/false>",
     run: async(client, msg, args) => {
         var input = null

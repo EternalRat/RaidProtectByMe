@@ -6,7 +6,7 @@ module.exports = {
     name: "raidmode",
     aliases: ["rm"],
     category: "🤖 security 🤖",
-    description: "Turn on the raidmode",
+    description: "Turn on the raidmode [default: false]",
     usage: "<true/false>",
     run: async(client, msg, args) => {
         var input = null

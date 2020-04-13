@@ -2,6 +2,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client({disableEveryone: true});
 const fs = require("fs");
+const moment = require("moment")
 
 //Fichier perso
 const banlist = JSON.parse(fs.readFileSync("./json/blacklist.json"));
@@ -9,6 +10,7 @@ const settings = JSON.parse(fs.readFileSync("./json/settings.json"));
 const raidmode = JSON.parse(fs.readFileSync("./json/raidmode.json"));
 const authorize = JSON.parse(fs.readFileSync("./json/allowed_channel.json"))
 const antilink = JSON.parse(fs.readFileSync("./json/anti-link.json"))
+const antiraid = JSON.parse(fs.readFileSync("./json/anti-raid.json"));
 const {saveFile} = require("./utils/utils.js");
 client.mutes = require("./json/mutes.json");
 const {prefix, version, author, token} = require("./botSettings.json");
@@ -81,6 +83,11 @@ client.on("guildCreate", async (guild) => {
     tab[i][0] = new Array();
     tab[i][0].push(guild.id)
     i++
+    antiraid[guild.id] = {
+        time: 3,
+        people: 5
+    }
+    saveFile(antiraid, "./json/anti-raid.json")
     antilink[guild.id] = {
         active: false
     }
@@ -100,6 +107,8 @@ client.on("guildCreate", async (guild) => {
 })
 
 client.on("guildDelete", async(guild) => {
+    delete antiraid[guild.id]
+    saveFile(antiraid, "./json/anti-raid.json")
     delete antilink[guild.id]
     saveFile(antilink, "./json/anti-link.json")
     delete authorize[guild.id]
@@ -125,8 +134,8 @@ client.on("guildMemberAdd", async(member, guild) => {
         if (tab[x][0][0] == member.guild.id)
             break
     tab[x][1].push(member.user.id)
-    if ((member.joinedTimestamp - lastTimestamp) < 3000) {
-        if (tab[x][1].length >= 5) {
+    if ((member.joinedTimestamp - lastTimestamp) < (antiraid[member.guild.id].times * 1000)) {
+        if (tab[x][1].length >= antiraid[member.guild.id].people) {
             var j = 0
             for (; j < tab[x][1].length; j++) {
                 member.guild.members.get(tab[x][1][j]).ban("RAID")
@@ -146,11 +155,62 @@ client.on("guildMemberAdd", async(member, guild) => {
     }
 })
 
+client.on('messageDelete', async (message) => {
+    if (message.author.id === "593409768568258611") return
+    const logs = message.guild.channels.find(ch => ch.name === "logs-message")
+    if (message.guild.me.hasPermission('MANAGE_CHANNELS') && !logs) {
+        await message.guild.createChannel('logs-message', 'text')
+    } else if (!logs) {
+        return console.log('The logs channel does not exist and cannot be created')
+    }
+    const entry = await message.guild.fetchAuditLogs({
+        type: 'MESSAGE_DELETE'
+    }).then(audit => audit.entries.first())
+    let user
+    if (entry.extra.channel === message.channel && (entry.target.id === message.author.id) && (entry.createdTimestamp > (Date.now() - 5000)) && (entry.extra.count >= 1)) {
+        user = entry.executor.username
+    } else {
+        user = message.author
+    }
+    if (logs) {
+        if (!message.content) return
+        const logembed = new Discord.RichEmbed()
+            .setTitle('Message Deleted')
+            .setAuthor(user.tag, message.author.displayAvatarURL)
+            .addField(`**Message sent by ${message.author.username} has been deleted in ${message.channel.name}**`, message.content)
+            .addField("Date du message:", moment.utc(message.createdTimestamp).format("dddd Do MMMM in YYYY, HH:mm:ss"))
+            .setColor("#FF0000")
+            .setFooter(`#${message.channel.name}`)
+            .setTimestamp()
+        logs.send(logembed)
+    }
+})
+
 client.on("messageUpdate", async(oldMsg, newMsg) => {
     if (antilink[oldMsg.guild.id].active == true) {
+        if (newMsg.member.hasPermission("MANAGE_GUILD")) return
         if ((newMsg.cleanContent.includes("https://") || newMsg.cleanContent.includes("http://") || newMsg.cleanContent.includes("www.")) && !authorize[newMsg.guild.id].channels.indexOf(newMsg.channel.id)) {
             newMsg.delete().catch();
             newMsg.channel.send("Any link here !")
+        }
+    }
+    if (newMsg.channel.type == 'text' && newMsg.cleanContent != oldMsg.cleanContent) {
+        var log = newMsg.guild.channels.find(ch => ch.name === "logs-message")
+        if (!log)
+            await message.guild.createChannel('logs-message', 'text')
+        if (log != null) {
+            const logembed = new Discord.RichEmbed()
+                .setTitle('Message updated')
+                .setAuthor(newMsg.author.username, newMsg.author.displayAvatarURL)
+                .setDescription(`**Message sent by ${newMsg.author.username} has been updated in ${newMsg.channel.name}**`)
+                .addField("Before :", oldMsg.cleanContent)
+                .addField("After :", newMsg.cleanContent)
+                .addField("Modification date:", moment.utc(newMsg.editedTimestamp).format("dddd Do MMMM in YYYY, HH:mm:ss"))
+                .setColor("#FF0000")
+                .setThumbnail(client.user.avatarURL)
+                .setFooter(`#${newMsg.channel.name}`)
+                .setTimestamp()
+            log.send(logembed)
         }
     }
 })
@@ -163,6 +223,7 @@ client.on("message", async(message) => {
     let cmd = client.commands.get(cmds)
 
     if (antilink[message.guild.id].active == true) {
+        if (message.member.hasPermission("MANAGE_GUILD")) return
         if ((message.content.includes("https://") || message.content.includes("http://") || message.content.includes("www.")) && !authorize[message.guild.id].channels.indexOf(message.channel.id)) {
             message.delete().catch();
             message.channel.send("Any link here !")

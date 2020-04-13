@@ -6,7 +6,7 @@ module.exports = {
     name: "settings",
     aliases: ["s", "raider"],
     category: "🤖 security 🤖",
-    description: "Turn on the kick if someone blacklisted come",
+    description: "Turn on the kick if someone blacklisted come [default: false]",
     usage: "<true/false>",
     run: async(client, msg, args) => {
         var input = null

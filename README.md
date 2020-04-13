@@ -50,7 +50,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **EternalRat** - *Initial work* - [PurpleBooth](https://github.com/EternalRat)
+* **EternalRat** - *Initial work* - [EternalRat](https://github.com/EternalRat)
 
 ## License
 

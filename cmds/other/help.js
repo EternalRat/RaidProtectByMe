@@ -18,10 +18,10 @@ module.exports = {
 function getCMD(client, msg, cmd) {
     const embed = new RichEmbed()
     const command = client.commands.get(cmd.toLowerCase()) || client.commands.get(client.aliases.get(cmd.toLowerCase()))
-    let info = `No information found for command **${cmd.toLowerCase}**`
+    let info = `No information found for command **${cmd.toLowerCase()}**`
 
     if (!command)
-        return (msg.channel.send(embed.setColor("RANDOM").setDescription(info)))
+        return (msg.channel.send(info))
     
     if (command.name) info = `**Name**: ${command.name}\n`
     if (command.aliases) info += `**Aliases**: ${command.aliases.map(a => `\`${a}\``).join(", ")}\n`
@@ -38,9 +38,8 @@ function getAll(client, msg) {
         .setColor("RANDOM")
         .setThumbnail(msg.guild.iconURL)
         .setTitle("Help menu")
-        .setDescription("For more information, type !help <command>")
         .setAuthor(msg.author.username, msg.author.displayAvatarURL)
-        .setFooter(client.user.username, client.user.displayAvatarURL)
+        .setFooter("For more information, type !help <command> - " + client.user.username, client.user.displayAvatarURL)
     const cmds = (category) => {
         return client.commands
             .filter(cmd => cmd.category === category)
