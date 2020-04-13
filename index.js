@@ -155,62 +155,12 @@ client.on("guildMemberAdd", async(member, guild) => {
     }
 })
 
-client.on('messageDelete', async (message) => {
-    if (message.author.id === "593409768568258611") return
-    const logs = message.guild.channels.find(ch => ch.name === "logs-message")
-    if (message.guild.me.hasPermission('MANAGE_CHANNELS') && !logs) {
-        await message.guild.createChannel('logs-message', 'text')
-    } else if (!logs) {
-        return console.log('The logs channel does not exist and cannot be created')
-    }
-    const entry = await message.guild.fetchAuditLogs({
-        type: 'MESSAGE_DELETE'
-    }).then(audit => audit.entries.first())
-    let user
-    if (entry.extra.channel === message.channel && (entry.target.id === message.author.id) && (entry.createdTimestamp > (Date.now() - 5000)) && (entry.extra.count >= 1)) {
-        user = entry.executor.username
-    } else {
-        user = message.author
-    }
-    if (logs) {
-        if (!message.content) return
-        const logembed = new Discord.RichEmbed()
-            .setTitle('Message Deleted')
-            .setAuthor(user.tag, message.author.displayAvatarURL)
-            .addField(`**Message sent by ${message.author.username} has been deleted in ${message.channel.name}**`, message.content)
-            .addField("Date du message:", moment.utc(message.createdTimestamp).format("dddd Do MMMM in YYYY, HH:mm:ss"))
-            .setColor("#FF0000")
-            .setFooter(`#${message.channel.name}`)
-            .setTimestamp()
-        logs.send(logembed)
-    }
-})
-
 client.on("messageUpdate", async(oldMsg, newMsg) => {
     if (antilink[oldMsg.guild.id].active == true) {
         if (newMsg.member.hasPermission("MANAGE_GUILD")) return
         if ((newMsg.cleanContent.includes("https://") || newMsg.cleanContent.includes("http://") || newMsg.cleanContent.includes("www.")) && !authorize[newMsg.guild.id].channels.indexOf(newMsg.channel.id)) {
             newMsg.delete().catch();
             newMsg.channel.send("Any link here !")
-        }
-    }
-    if (newMsg.channel.type == 'text' && newMsg.cleanContent != oldMsg.cleanContent) {
-        var log = newMsg.guild.channels.find(ch => ch.name === "logs-message")
-        if (!log)
-            await message.guild.createChannel('logs-message', 'text')
-        if (log != null) {
-            const logembed = new Discord.RichEmbed()
-                .setTitle('Message updated')
-                .setAuthor(newMsg.author.username, newMsg.author.displayAvatarURL)
-                .setDescription(`**Message sent by ${newMsg.author.username} has been updated in ${newMsg.channel.name}**`)
-                .addField("Before :", oldMsg.cleanContent)
-                .addField("After :", newMsg.cleanContent)
-                .addField("Modification date:", moment.utc(newMsg.editedTimestamp).format("dddd Do MMMM in YYYY, HH:mm:ss"))
-                .setColor("#FF0000")
-                .setThumbnail(client.user.avatarURL)
-                .setFooter(`#${newMsg.channel.name}`)
-                .setTimestamp()
-            log.send(logembed)
         }
     }
 })
@@ -223,8 +173,8 @@ client.on("message", async(message) => {
     let cmd = client.commands.get(cmds)
 
     if (antilink[message.guild.id].active == true) {
-        if (message.member.hasPermission("MANAGE_GUILD")) return
         if ((message.content.includes("https://") || message.content.includes("http://") || message.content.includes("www.")) && !authorize[message.guild.id].channels.indexOf(message.channel.id)) {
+            if (message.member.hasPermission("MANAGE_GUILD")) return
             message.delete().catch();
             message.channel.send("Any link here !")
         }

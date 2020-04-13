@@ -19,7 +19,7 @@ module.exports = {
             .setDescription(`Do ${prefix}help to see all the commands to change those settings !`)
             .addField("RaidMode", `Status : ${raidmode[msg.guild.id].active}`)
             .addField("Kicking blacklisted person", `Status : ${settings[msg.guild.id].active}`)
-            .addField("Anti-Raid settings", `Number of people : ${antiraid[msg.guild.id].people}\nDelay : ${antiraid[msg.guild.id].time}`)
+            .addField("Anti-Raid settings", `Number of people : ${antiraid[msg.guild.id].people}\nDelay : ${antiraid[msg.guild.id].time}seconds`)
             .addField("Anti-link", `Status : ${antilink[msg.guild.id].active}`)
             .setThumbnail(msg.guild.iconURL)
             .setAuthor(msg.author.username, msg.author.displayAvatarURL)
