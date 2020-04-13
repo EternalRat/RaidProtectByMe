@@ -156,9 +156,9 @@ client.on("guildMemberAdd", async(member, guild) => {
 })
 
 client.on("messageUpdate", async(oldMsg, newMsg) => {
-    if (antilink[oldMsg.guild.id].active == true) {
-        if (newMsg.member.hasPermission("MANAGE_GUILD")) return
+    if (antilink[oldMsg.guild.id].active == true && !newMsg.bot) {
         if ((newMsg.cleanContent.includes("https://") || newMsg.cleanContent.includes("http://") || newMsg.cleanContent.includes("www.")) && !authorize[newMsg.guild.id].channels.indexOf(newMsg.channel.id)) {
+            if (newMsg.member.hasPermission("MANAGE_GUILD")) return
             newMsg.delete().catch();
             newMsg.channel.send("Any link here !")
         }
@@ -171,6 +171,7 @@ client.on("message", async(message) => {
     let args = messageArray.slice(1)
     let cmds = command.slice(prefix.length)
     let cmd = client.commands.get(cmds)
+    if (message.author.bot) return;
 
     if (antilink[message.guild.id].active == true) {
         if ((message.content.includes("https://") || message.content.includes("http://") || message.content.includes("www.")) && !authorize[message.guild.id].channels.indexOf(message.channel.id)) {
@@ -179,7 +180,6 @@ client.on("message", async(message) => {
             message.channel.send("Any link here !")
         }
     }
-    if (message.author.bot) return;
     if (!command.startsWith(prefix)) return
     if (!cmd) cmd = client.commands.get(client.aliases.get(cmds))
     if (cmd) {
