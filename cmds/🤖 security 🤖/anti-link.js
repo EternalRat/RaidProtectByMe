@@ -33,7 +33,7 @@ module.exports = {
                             msg.channel.send("This user has been removed from the blacklist.")
                             break
                         case "👎":
-                            msg.chanel.send("Okay boss.")
+                            msg.channel.send("Okay boss.")
                             break
                     }
                 })
