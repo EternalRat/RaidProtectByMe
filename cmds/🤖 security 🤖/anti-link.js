@@ -11,13 +11,12 @@ module.exports = {
     usage: "<channel>",
     run: async(client, msg, args) => {
         if (!msg.member.hasPermission("MANAGE_GUILD")) return (msg.channel.send("You haven't the right to do this"))
-        let chan_id = msg.mentions.channels.first().id
-        if (!chan_id) return (msg.channel.send(`Usage: !channels-no-link #${client.commands.get("channels-no-link").usage}`))
-        if (!authorize[msg.guild.id].channels.includes(chan_id)) {
+        let channelsArray = msg.mentions.channels
+        channelsArray.forEach(guild => {
+        if (!authorize[msg.guild.id].channels.includes(guild.id)) {
             msg.channel.send("The channel has been added to the list")
-            authorize[msg.guild.id].channels.push(chan_id)
-            saveFile(authorize, "./json/allowed_channel.json")
-        } else if (authorize[msg.guild.id].channels.includes(chan_id)) {
+            authorize[msg.guild.id].channels.push(guild.id)
+        } else if (authorize[msg.guild.id].channels.includes(guild.id)) {
             const filter = (reaction, user) => ["👍", "👎"].includes(reaction.emoji.name) && user.id === msg.author.id
             msg.channel.send("This channel is already in the list, do you want to remove it ?").then(msg => {
                 msg.react("👎")
@@ -30,9 +29,8 @@ module.exports = {
                     const reaction = collected.first()
                     switch (reaction.emoji.name) {
                         case "👍":
-                            delete authorize[msg.guild.id].channels.splice(authorize[msg.guild.id].channels.indexOf(chan_id), 1)
+                            delete authorize[msg.guild.id].channels.splice(authorize[msg.guild.id].channels.indexOf(guild.id), 1)
                             msg.channel.send("This user has been removed from the blacklist.")
-                            saveFile(authorize, "./json/allowed_channel.json")
                             break
                         case "👎":
                             msg.chanel.send("Okay boss.")
@@ -41,5 +39,7 @@ module.exports = {
                 })
             })
         }
+        });
+        saveFile(authorize, "./json/allowed_channel.json")
     }
 }
