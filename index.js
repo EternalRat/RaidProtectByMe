@@ -29,7 +29,7 @@ var lastTimestamp = 0;
 var i = 0;
 
 client.on("ready", async () => {
-    console.log(`${client.user.username} prêt !`)
+    console.log(`[${moment.utc(Date.now()).format("dddd Do MMMM, HH:mm:ss")}] ${client.user.username} prêt !`)
 
     let status1 = [
         prefix + "help",
