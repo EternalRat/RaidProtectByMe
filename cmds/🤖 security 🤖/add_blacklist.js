@@ -10,10 +10,14 @@ module.exports = {
     usage: "<@user> <reason>",
     run: async(client, msg, args) => {
         if (msg.author.id === "291646942038196224") {
-            const target = msg.guild.member(msg.mentions.users.first() || msg.guild.members.get(args[0])).id || args[0];
+            const target = msg.guild.member(msg.mentions.users.first() || msg.guild.members.get(args[0]));
             if (!target) {
-                msg.channel.send("Usage: <@user> <reason>");
-                return
+                if (args[0].length == 18)
+                    target = args[0]
+                else {
+                    msg.channel.send("Usage: <@user> <reason>");
+                    return
+                }
             }
             let reason = args.join(" ").slice(22);
             if (!reason) {
