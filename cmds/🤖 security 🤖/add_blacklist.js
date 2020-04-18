@@ -10,23 +10,19 @@ module.exports = {
     usage: "<@user> <reason>",
     run: async(client, msg, args) => {
         if (msg.author.id === "291646942038196224") {
-            let target = msg.guild.member(msg.mentions.users.first() || msg.guild.members.get(args[0]));
+            let target = args[0] || msg.mentions.users.first().id;
             if (!target) {
-                if (args[0].length == 18)
-                    target = args[0]
-                else {
-                    msg.channel.send("Usage: <@user> <reason>");
-                    return
-                }
+                msg.channel.send("Usage: <@user> <reason>");
+                return
             }
             let reason = args.join(" ").slice(22);
             if (!reason) {
                 msg.channel.send("Usage: <@user> <reason>");
                 return
             }
-            if (!banlist[target.id]) {
+            if (!banlist[target]) {
                 msg.channel.send("This user has been added to the blacklist")
-                banlist[target.id] = {
+                banlist[target] = {
                     reason: reason
                 }
                 saveFile(banlist, "./json/blacklist.json")
@@ -43,7 +39,7 @@ module.exports = {
                         const reaction = collected.first()
                         switch (reaction.emoji.name) {
                             case "👍":
-                                delete banlist[target.id]
+                                delete banlist[target]
                                 msg.channel.send("This user has been removed from the blacklist.")
                                 saveFile(banlist, "./json/blacklist.json")
                                 break
